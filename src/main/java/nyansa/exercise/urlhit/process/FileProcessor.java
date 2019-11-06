@@ -16,10 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-//TODO: Write README.md with assumptions
-// File is assumed to be valid
-// Allocating 8MB of memory for the map at each iteration
-
 @Getter
 @Setter
 @Log4j2
@@ -37,7 +33,7 @@ public class FileProcessor {
     }
 
     /*
-     * 1. Read each line up READ_LIMIT amount of records at a time
+     * 1. Read each line up to READ_LIMIT amount of records at a time
      * 2. Process each record and write to temp files after every 100K records
      * 3. Write any remaining records to temp file
      * 4. Write output to the console
@@ -70,15 +66,13 @@ public class FileProcessor {
     }
 
     /*
-     * For each key in the result map create a file with key as the ame
+     * For each key in the result map create a file with key as the name
      * Write the nested map to the file
      * If the file already exists, update the map with the current count for each URL
      */
     private void writeToFiles() throws IOException {
         log.trace("start writing to temp files");
-//        try {
         log.debug("total number of files being written: " + result.size());
-        log.info("writing result map to temp files");
 
         for (Map.Entry<String, Map<String, Long>> entry : result.entrySet()) {
             String filePath = properties.getProperty("temppath") + entry.getKey();
@@ -99,14 +93,12 @@ public class FileProcessor {
                     .map(key -> key + "," + currentUrlCountMap.get(key))
                     .collect(Collectors.joining("\n"));
 
-            log.debug("writing to the file: " + filePath);
+            log.info("writing to the file: " + filePath);
             // write/rewrite back to the original file
             Files.write(Paths.get(filePath), mapAsString.getBytes(),
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
         log.trace("end writing to temp files");
     }
 
@@ -168,7 +160,7 @@ public class FileProcessor {
         log.trace(" start writing output to console");
         log.info("processing all the temp files and writing output");
 
-        List<File> tempFiles = Arrays.asList(Paths.get(properties.getProperty("temppath")).toFile().listFiles());
+        List<File> tempFiles = Arrays.asList(Objects.requireNonNull(Paths.get(properties.getProperty("temppath")).toFile().listFiles()));
         Collections.sort(tempFiles);
         log.debug("Total number of distinct dates in the input: " + tempFiles.size());
 
@@ -188,7 +180,7 @@ public class FileProcessor {
 
     private void cleanup() {
         log.trace("start cleanup of temp files");
-        Arrays.stream(new File(properties.getProperty("temppath")).listFiles()).forEach(File::delete);
+        Arrays.stream(Objects.requireNonNull(new File(properties.getProperty("temppath")).listFiles())).forEach(File::delete);
         log.trace("end cleanup of temp files");
     }
 
@@ -198,7 +190,7 @@ public class FileProcessor {
         Map<String, Long> tempMap = new HashMap<>();
         try (Stream<String> existingRecords = Files.lines(p)) {
             existingRecords.forEach(existingRecord -> {
-                String[] recordFields = existingRecord.split("\\,");
+                String[] recordFields = existingRecord.split(",");
                 tempMap.put(recordFields[0], Long.parseLong(recordFields[1]));
             });
         }

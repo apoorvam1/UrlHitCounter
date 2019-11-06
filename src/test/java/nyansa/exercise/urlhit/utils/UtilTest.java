@@ -1,6 +1,7 @@
+package nyansa.exercise.urlhit.utils;
+
 import org.junit.Assert;
 import org.junit.Test;
-import nyansa.exercise.urlhit.utils.Util;
 
 public class UtilTest {
 

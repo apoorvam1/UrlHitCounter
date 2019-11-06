@@ -1,8 +1,9 @@
-import org.junit.Assert;
-import org.junit.Test;
+package nyansa.exercise.urlhit.process;
+
 import nyansa.exercise.urlhit.config.ConfigurationManager;
 import nyansa.exercise.urlhit.exception.ConfigurationException;
-import nyansa.exercise.urlhit.process.FileProcessor;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Properties;
 
